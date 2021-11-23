@@ -22,8 +22,18 @@ use App\Http\Controllers\SiteController;
 Route::get('/', [SiteController::class, 'index'])->name('website.index');
 Route::get('/category/{slug}', [SiteController::class, 'category'])->name('website.category');
 Route::get('/product/{slug}', [SiteController::class, 'product'])->name('website.product');
+Route::get('/checkout', [SiteController::class, 'checkout'])->name('website.checkout');
+Route::post('/payment', [SiteController::class, 'payment'])->name('website.payment');
 Route::delete('/cart/remove/{id}', [SiteController::class, 'remove_item'])->name('website.remove_item');
 Route::post('/product/buy', [SiteController::class, 'buy'])->middleware('auth')->name('website.buy');
+
+Route::get('success', function() {
+    return 'Done';
+})->name('success');
+
+Route::get('fail', function() {
+    return 'Fail';
+})->name('fail');
 
 // Route::get('/admin', function () {
 //     return 'admin area';

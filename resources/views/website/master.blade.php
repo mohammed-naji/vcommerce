@@ -90,7 +90,9 @@ use App\Models\Category;
 								<li><i class="ti-location-pin"></i> Store location</li>
 								<li><i class="ti-alarm-clock"></i> <a href="#">Daily deal</a></li>
 								<li><i class="ti-user"></i> <a href="#">My account</a></li>
-								<li><i class="ti-power-off"></i><a href="login.html#">Login</a></li>
+                                @guest
+								<li><i class="ti-power-off"></i><a href="{{ route('login') }}">Login</a></li>
+                                @endguest
 							</ul>
 						</div>
 						<!-- End Top Right -->
@@ -149,7 +151,11 @@ use App\Models\Category;
 								<a href="#" class="single-icon"><i class="fa fa-user-circle-o" aria-hidden="true"></i></a>
 							</div>
                             @php
+                            $count = 0;
+                            if(Auth::user()) {
                                 $count = Auth::user()->carts()->where('type', 'cart')->count();
+                            }
+
                                 $total = 0;
                             @endphp
 							<div class="sinlge-bar shopping">
@@ -160,7 +166,8 @@ use App\Models\Category;
 										<span>{{ $count }} Items</span>
 										<a href="#">View Cart</a>
 									</div>
-									<ul class="shopping-list">
+                                    @auth
+                                    <ul class="shopping-list">
                                         @foreach (Auth::user()->carts()->where('type', 'cart')->get() as $item)
                                         <li>
 											{{-- <a href="{{ route('website.remove_item', $item->id) }}" class="remove" title="Remove this item"><i class="fa fa-remove"></i></a> --}}
@@ -178,12 +185,14 @@ use App\Models\Category;
                                         @endforeach
 
 									</ul>
+                                    @endauth
+
 									<div class="bottom">
 										<div class="total">
 											<span>Total</span>
 											<span class="total-amount">${{ $total }}</span>
 										</div>
-										<a href="checkout.html" class="btn animate">Checkout</a>
+										<a href="{{ route('website.checkout') }}" class="btn animate">Checkout</a>
 									</div>
 								</div>
 								<!--/ End Shopping Item -->
@@ -198,6 +207,8 @@ use App\Models\Category;
 			<div class="container">
 				<div class="cat-nav-head">
 					<div class="row">
+
+                        @if(request()->routeIs('website.index'))
 						<div class="col-lg-3">
 							<div class="all-category">
 								<h3 class="cat-heading"><i class="fa fa-bars" aria-hidden="true"></i>CATEGORIES</h3>
@@ -208,6 +219,7 @@ use App\Models\Category;
 								</ul>
 							</div>
 						</div>
+                        @endif
 						<div class="col-lg-9 col-12">
 							<div class="menu-area">
 								<!-- Main Menu -->
