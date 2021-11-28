@@ -54,9 +54,18 @@ use App\Models\Category;
         }
     </style>
 
+@if (app()->currentLocale() == 'ar')
+<style>
+    body {
+        direction: rtl;
+        text-align: right;
+    }
+</style>
+@endif
+
+
 </head>
 <body class="js">
-
 	<!-- Preloader -->
 	<div class="preloader">
 		<div class="preloader-inner">
@@ -87,12 +96,40 @@ use App\Models\Category;
 						<!-- Top Right -->
 						<div class="right-content">
 							<ul class="list-main">
-								<li><i class="ti-location-pin"></i> Store location</li>
-								<li><i class="ti-alarm-clock"></i> <a href="#">Daily deal</a></li>
-								<li><i class="ti-user"></i> <a href="#">My account</a></li>
+								<li><i class="ti-location-pin"></i> {{ __('site.location') }}</li>
+								<li><i class="ti-alarm-clock"></i> <a href="#">{{ __('site.daily') }}</a></li>
+								<li><i class="ti-user"></i> <a href="#">{{ __('site.my_account') }}</a></li>
+
+                                @auth
+                                <li><i class="ti-power-off"></i><a href="" onclick="event.preventDefault(); document.getElementById('logout-form').submit()">Logout</a></li>
+                                <li>
+                                    <form id="logout-form" action="{{ route('logout') }}" method="post">
+                                        @csrf
+                                    </form>
+                                </li>
+                                @endauth
+
+                                <li>
+                                    <div class="dropdown">
+                                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
+                                          {{ __('site.languages') }}
+                                        </button>
+                                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                                            @foreach(LaravelLocalization::getSupportedLocales() as $localeCode => $properties)
+
+                                            <a class="dropdown-item" rel="alternate" hreflang="{{ $localeCode }}" href="{{ LaravelLocalization::getLocalizedURL($localeCode, null, [], true) }}">
+                                                {{ $properties['native'] }}
+                                            </a>
+
+                                    @endforeach
+                                        </div>
+                                      </div>
+                                </li>
+
                                 @guest
 								<li><i class="ti-power-off"></i><a href="{{ route('login') }}">Login</a></li>
                                 @endguest
+
 							</ul>
 						</div>
 						<!-- End Top Right -->
@@ -153,7 +190,7 @@ use App\Models\Category;
                             @php
                             $count = 0;
                             if(Auth::user()) {
-                                $count = Auth::user()->carts()->where('type', 'cart')->count();
+                                $count = Auth::user()->carts()->where('type', 'cart')->whereNull('order_id')->count();
                             }
 
                                 $total = 0;
@@ -168,7 +205,7 @@ use App\Models\Category;
 									</div>
                                     @auth
                                     <ul class="shopping-list">
-                                        @foreach (Auth::user()->carts()->where('type', 'cart')->get() as $item)
+                                        @foreach (Auth::user()->carts()->whereNull('order_id')->where('type', 'cart')->get() as $item)
                                         <li>
 											{{-- <a href="{{ route('website.remove_item', $item->id) }}" class="remove" title="Remove this item"><i class="fa fa-remove"></i></a> --}}
                                             <form class="d-inline" method="POST" action="{{ route('website.remove_item', $item->id) }}">

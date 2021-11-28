@@ -19,44 +19,49 @@ use App\Http\Controllers\SiteController;
 |
 */
 
-Route::get('/', [SiteController::class, 'index'])->name('website.index');
-Route::get('/category/{slug}', [SiteController::class, 'category'])->name('website.category');
-Route::get('/product/{slug}', [SiteController::class, 'product'])->name('website.product');
-Route::get('/checkout', [SiteController::class, 'checkout'])->name('website.checkout');
-Route::post('/payment', [SiteController::class, 'payment'])->name('website.payment');
-Route::delete('/cart/remove/{id}', [SiteController::class, 'remove_item'])->name('website.remove_item');
-Route::post('/product/buy', [SiteController::class, 'buy'])->middleware('auth')->name('website.buy');
+Route::group(['prefix' => LaravelLocalization::setLocale()], function()
+{
 
-Route::get('success', function() {
-    return 'Done';
-})->name('success');
+    Route::get('/', [SiteController::class, 'index'])->name('website.index');
+    Route::get('/category/{slug}', [SiteController::class, 'category'])->name('website.category');
+    Route::get('/product/{slug}', [SiteController::class, 'product'])->name('website.product');
+    Route::get('/checkout', [SiteController::class, 'checkout'])->name('website.checkout');
+    Route::post('/payment', [SiteController::class, 'payment'])->name('website.payment');
+    Route::delete('/cart/remove/{id}', [SiteController::class, 'remove_item'])->name('website.remove_item');
+    Route::post('/product/buy', [SiteController::class, 'buy'])->middleware('auth')->name('website.buy');
 
-Route::get('fail', function() {
-    return 'Fail';
-})->name('fail');
+    Route::get('success', function() {
+        return 'Done';
+    })->name('success');
 
-// Route::get('/admin', function () {
-//     return 'admin area';
-// })->middleware('auth', 'verified');
+    Route::get('fail', function() {
+        return 'Fail';
+    })->name('fail');
+
+    // Route::get('/admin', function () {
+    //     return 'admin area';
+    // })->middleware('auth', 'verified');
 
 
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'isAdmin'])->group(function() {
-    Route::get('/', [DashboardController::class, 'index']);
+    Route::prefix('admin')->name('admin.')->middleware(['auth', 'verified', 'isAdmin'])->group(function() {
+        Route::get('/', [DashboardController::class, 'index']);
 
-    Route::resource('categories', CategoryController::class);
-    Route::resource('discounts', DiscountController::class);
-    Route::resource('products', ProductController::class);
+        Route::resource('categories', CategoryController::class);
+        Route::resource('discounts', DiscountController::class);
+        Route::resource('products', ProductController::class);
+
+    });
+
+
+
+
+
+    Route::get('/user', function () {
+        return 'user area';
+    })->middleware('auth', 'verified');
+
+    Auth::routes(['verify' => true]);
+
+    Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
 
 });
-
-
-
-
-
-Route::get('/user', function () {
-    return 'user area';
-})->middleware('auth', 'verified');
-
-Auth::routes(['verify' => true]);
-
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');

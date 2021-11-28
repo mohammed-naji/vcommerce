@@ -13,7 +13,15 @@
         </div> --}}
     </div>
     <div class="product-content">
-        <h3><a href="{{ route('website.product', $product->slug) }}">{{ $product->name }}</a></h3>
+        @php
+            $title = 'name_en';
+            if (app()->currentLocale() == 'ar') {
+                $title = 'name_ar';
+            }
+
+
+        @endphp
+        <h3><a href="{{ route('website.product', $product->slug) }}">{{ $product->$title }}</a></h3>
         <div class="product-price">
             <span>${{ $product->price }}</span>
         </div>
